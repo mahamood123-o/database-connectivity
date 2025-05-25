@@ -1,34 +1,32 @@
 <?php
-// Database configuration - update these as per your XAMPP setup
+// Database connection parameters
 $servername = "localhost";
 $username = "root";
 $password = "";
-$dbname = "testdb";  // Change to your database name
+$dbname = "testdb";
 
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $name = htmlspecialchars($_POST['name']);
+// Create connection
+$conn = new mysqli($servername, $username, $password, $dbname);
 
-    // Create connection
-    $conn = new mysqli($servername, $username, $password, $dbname);
-
-    // Check connection
-    if ($conn->connect_error) {
-        die("Connection failed: " . $conn->connect_error);
-    }
-
-    // Prepare and bind
-    $stmt = $conn->prepare("INSERT INTO names (name) VALUES (?)");
-    $stmt->bind_param("s", $name);
-
-    if ($stmt->execute()) {
-        echo "Hello, " . $name . "! Your form has been submitted and stored successfully.";
-    } else {
-        echo "Error: " . $stmt->error;
-    }
-
-    $stmt->close();
-    $conn->close();
-} else {
-    echo "Invalid request method.";
+// Check connection
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
 }
+
+// Prepare and bind
+$stmt = $conn->prepare("INSERT INTO users (name, email) VALUES (?, ?)");
+$stmt->bind_param("ss", $name, $email);
+
+// Set parameters and execute
+$name = $_POST['name'];
+$email = $_POST['email'];
+
+if ($stmt->execute()) {
+    echo "New record created successfully.";
+} else {
+    echo "Error: " . $stmt->error;
+}
+
+$stmt->close();
+$conn->close();
 ?>
